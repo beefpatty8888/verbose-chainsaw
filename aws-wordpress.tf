@@ -73,7 +73,7 @@ resource "aws_subnet" "wordpress_subnet_public_b" {
 # This is compatible with ipv6 only
 # https://docs.aws.amazon.com/vpc/latest/userguide/egress-only-internet-gateway.html
 #resource "aws_egress_only_internet_gateway" "wordpress_egress" {
-#  vpc_id = aws_vpc.eks_vpc.id
+#  vpc_id = aws_vpc.wordpress_vpc.id
 #
 #  tags = {
 #    Name = "wordpress_egress"
@@ -193,8 +193,8 @@ resource "aws_security_group" "allow_ssh_anywhere" {
 }
 
 ## Create Route To the Gateway in the VPC Route Table ##
-resource "aws_route" "eks_route" {
-  route_table_id = aws_vpc.eks_vpc.default_route_table_id
+resource "aws_route" "wordpress_route" {
+  route_table_id = aws_vpc.wordpress_vpc.default_route_table_id
     destination_cidr_block    = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.wordpress_gw.id
   
@@ -216,7 +216,7 @@ resource "aws_eip" "wordpress_subnet_priv_b_eip" {
 ## NOTE: NAT gateways MUST be on the public subnets 
 ## See: https://docs.aws.amazon.com/vpc/latest/userguide/nat-gateway-troubleshooting.html#nat-gateway-troubleshooting-no-internet-connection
 resource "aws_nat_gateway" "wordpress_subnet_priv_a_gw" {
-  allocation_id = aws_eip.eks_subnet_priv_a_eip.id
+  allocation_id = aws_eip.wordpress_subnet_priv_a_eip.id
   subnet_id     = aws_subnet.wordpress_subnet_public_a.id
 
   tags = {
