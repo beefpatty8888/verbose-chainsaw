@@ -325,7 +325,7 @@ resource "aws_instance" "wordpress_host_a" {
   }
 }
 
-esource "aws_instance" "wordpress_host_b" {
+resource "aws_instance" "wordpress_host_b" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
   key_name      = var.aws-key-pair
@@ -342,5 +342,53 @@ esource "aws_instance" "wordpress_host_b" {
 
 ## Wordpress EFS Instance Creation ##
 
+resource "aws_efs_file_system" "wordpress_efs" {
+  creation_token = "wordpress_efs"
+  encrypted = true
+
+  tags = {
+    Name = "wordpress"
+  }
+}
+
 
 ## Wordpress RDS Instance Creation ##
+
+resource "aws_subnet" "wordpress_subnet_priv_c" {
+  vpc_id     = aws_vpc.wordpress_vpc.id
+  cidr_block = "10.0.80.0/20"
+  availability_zone = "us-east-2a"
+
+  tags = {
+    Name = "wordpress_subnet_priv_c"
+  }
+}
+
+# https://stackoverflow.com/questions/59239970/terraform-error-creating-subnet-dependency
+resource "aws_db_subnet_group" "wordpress_db_subnet_priv_a" {
+  name       = "wordpress_db_subnet"
+  subnet_ids = aws_subnet.wordpress_subnet_priv_c.id
+
+  tags = {
+    Name = "Wordpress DB subnet"
+  }
+}
+
+resource "aws_db_instance" "default" {
+  allocated_storage    = 10
+  db_name              = "wordpressdb"
+  engine               = "mysql"
+  engine_version       = "5.7"
+  instance_class       = "db.t3.micro"
+  username             = var.db_username
+  password             = var.db_password
+  parameter_group_name = "default.mysql5.7"
+  skip_final_snapshot  = true
+  publicly_accessible  = false
+
+  db_subnet_group_name = aws_db_subnet_group.wordpress_db_subnet_priv_a.id
+}
+
+## Wordpress DB Security Rules ##
+
+## Wordpress RDS Read Replica ##
