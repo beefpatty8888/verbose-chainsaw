@@ -367,7 +367,7 @@ resource "aws_subnet" "wordpress_subnet_priv_c" {
 # https://stackoverflow.com/questions/59239970/terraform-error-creating-subnet-dependency
 resource "aws_db_subnet_group" "wordpress_db_subnet_priv_a" {
   name       = "wordpress_db_subnet"
-  subnet_ids = aws_subnet.wordpress_subnet_priv_c.id
+  subnet_ids = [aws_subnet.wordpress_subnet_priv_c.id]
 
   tags = {
     Name = "Wordpress DB subnet"

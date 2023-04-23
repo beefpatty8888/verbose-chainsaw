@@ -6,3 +6,9 @@ In the dynamicInventory.py, the hashbang will be different for the path to pytho
 `ansible-inventory -i ./dynamicInventory.py --list`
 
 `ansible -v -i ./dynamicInventory.py webservers -m raw -a "ls -latr" --list-hosts`
+
+# terraform infrastructure
+
+`terraform init`
+
+`terraform plan`
